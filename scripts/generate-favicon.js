@@ -1,0 +1,83 @@
+const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
+
+const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#000B4F"/>
+      <stop offset="50%" stop-color="#061338"/>
+      <stop offset="100%" stop-color="#080C16"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="70%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  
+  <!-- Subtle Glowing Outer Border -->
+  <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="url(#accent)" stroke-width="16" stroke-opacity="0.8"/>
+
+  <!-- Top Cyan Rack Longarina Accent -->
+  <rect x="136" y="120" width="240" height="14" rx="7" fill="url(#cyan)"/>
+  <circle cx="164" cy="127" r="3.5" fill="#000B4F"/>
+  <circle cx="256" cy="127" r="3.5" fill="#000B4F"/>
+  <circle cx="348" cy="127" r="3.5" fill="#000B4F"/>
+
+  <!-- Central Bold PMT Typography -->
+  <text x="256" y="306" text-anchor="middle" font-family="'Arial Black', 'Impact', 'Urbanist', sans-serif" font-weight="900" font-size="168" fill="#FFFFFF" letter-spacing="-3">PMT</text>
+
+  <!-- Industrial Amber Beam Accent with Rack Holes -->
+  <rect x="116" y="348" width="280" height="20" rx="10" fill="url(#amber)"/>
+  <circle cx="144" cy="358" r="4" fill="#000B4F"/>
+  <circle cx="188" cy="358" r="4" fill="#000B4F"/>
+  <circle cx="232" cy="358" r="4" fill="#000B4F"/>
+  <circle cx="280" cy="358" r="4" fill="#000B4F"/>
+  <circle cx="324" cy="358" r="4" fill="#000B4F"/>
+  <circle cx="368" cy="358" r="4" fill="#000B4F"/>
+
+  <!-- 'LOG' Subtitle Badge -->
+  <text x="256" y="416" text-anchor="middle" font-family="'Arial Black', 'Helvetica', sans-serif" font-weight="900" font-size="44" fill="#38BDF8" letter-spacing="12">LOG</text>
+</svg>
+`;
+
+async function main() {
+  const root = 'F:/Github/pmtlog';
+  const appDir = path.join(root, 'src/app');
+  const pubDir = path.join(root, 'public');
+
+  fs.writeFileSync(path.join(appDir, 'icon.svg'), svg.trim());
+  fs.writeFileSync(path.join(pubDir, 'favicon.svg'), svg.trim());
+
+  const svgBuf = Buffer.from(svg);
+
+  // 512x512
+  await sharp(svgBuf).resize(512, 512).png().toFile(path.join(appDir, 'icon.png'));
+  await sharp(svgBuf).resize(512, 512).png().toFile(path.join(pubDir, 'icon-512.png'));
+
+  // 180x180 (Apple)
+  await sharp(svgBuf).resize(180, 180).png().toFile(path.join(appDir, 'apple-icon.png'));
+  await sharp(svgBuf).resize(180, 180).png().toFile(path.join(pubDir, 'apple-touch-icon.png'));
+
+  // 32x32 & 48x48
+  await sharp(svgBuf).resize(32, 32).png().toFile(path.join(pubDir, 'favicon-32x32.png'));
+  await sharp(svgBuf).resize(32, 32).png().toFile(path.join(pubDir, 'favicon.ico'));
+  await sharp(svgBuf).resize(32, 32).png().toFile(path.join(appDir, 'favicon.ico'));
+
+  console.log('Successfully created all favicon assets!');
+}
+
+main().catch(console.error);
